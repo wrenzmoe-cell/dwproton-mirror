@@ -825,6 +825,7 @@ int main(int argc, char *argv[])
     if ((sgi = getenv("SteamGameId")))
     {
         WCHAR path[MAX_PATH], *p;
+        const char *canonical_hole
 
         /* do setup only for game process */
         event = CreateEventW( NULL, FALSE, FALSE, L"Steam3Master_SharedMemLock" );
@@ -850,6 +851,15 @@ int main(int argc, char *argv[])
 
         setup_steam_registry();
         setup_steam_files();
+
+        if ((canonical_hole = getenv("WINE_CANONICAL_HOLE")))
+        {
+            if (strcmp(canonical_hole, "skip_volatile_check") == 0) {
+                FIXME("skipping the volatile check, ACE has been hacked in under 18 hours :jokerge:\n");
+            } else {
+                ERR("unrecognized option `%s`\n", canonical_hole);
+            }
+        }
 
         if (env_nonzero("PROTON_WAIT_ATTACH"))
         {
