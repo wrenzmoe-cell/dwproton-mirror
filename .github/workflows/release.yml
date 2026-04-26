@@ -80,8 +80,15 @@ jobs:
       - name: Extract release notes from CHANGELOG.md
         run: |
           TAG="${{ github.ref_name }}"
-          awk "/^## \[$TAG\]/{found=1; next} found && /^## \[/{exit} found && /^---$/{exit} found{print}" CHANGELOG.md \
-            > /tmp/release-notes.md
+          touch /tmp/release-notes.md
+          if [ -f CHANGELOG.md ]; then
+            awk -v tag="$TAG" \
+              '$0 ~ "^## \\[" tag "\\]" {found=1; next} found && /^## \[/{exit} found && /^---$/{exit} found{print}' \
+              CHANGELOG.md > /tmp/release-notes.md
+          fi
+          if [ ! -s /tmp/release-notes.md ]; then
+            echo "Release $TAG" > /tmp/release-notes.md
+          fi
 
       - name: Download all artifacts
         uses: actions/download-artifact@v3
