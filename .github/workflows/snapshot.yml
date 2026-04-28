@@ -29,9 +29,12 @@ jobs:
           git submodule update --init --filter=tree:0 --recursive
           mkdir ./build
 
-      - name: Get short SHA
+      - name: Get version
         id: vars
-        run: echo "sha_short=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+        run: |
+          tag=$(git describe --tags --abbrev=0)
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "sha_short=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
 
       - name: Configure
         working-directory: ./build
@@ -40,7 +43,7 @@ jobs:
           USE_LTO: 0
         run: |
           ../configure.sh \
-            --build-name=dwproton-snapshot-${{ steps.vars.outputs.sha_short }}-x86_64 \
+            --build-name=dwproton-${{ steps.vars.outputs.tag }}-${{ steps.vars.outputs.sha_short }}-x86_64 \
             --enable-ccache \
             --without-tts
 
@@ -60,8 +63,8 @@ jobs:
       - name: Upload snapshot artifact
         uses: actions/upload-artifact@v3
         with:
-          name: dwproton-snapshot-${{ steps.vars.outputs.sha_short }}-x86_64
+          name: dwproton-${{ steps.vars.outputs.tag }}-${{ steps.vars.outputs.sha_short }}-x86_64
           path: |
-            ./build/dwproton-snapshot-${{ steps.vars.outputs.sha_short }}-x86_64.tar.xz
-            ./build/dwproton-snapshot-${{ steps.vars.outputs.sha_short }}-x86_64.sha512sum
+            ./build/dwproton-${{ steps.vars.outputs.tag }}-${{ steps.vars.outputs.sha_short }}-x86_64.tar.xz
+            ./build/dwproton-${{ steps.vars.outputs.tag }}-${{ steps.vars.outputs.sha_short }}-x86_64.sha512sum
           retention-days: 14
