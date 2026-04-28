@@ -1,7 +1,7 @@
-From f8add02f91615a51994e1931e3f745c6656a7392 Mon Sep 17 00:00:00 2001
+From 5edc9a147b28747c28b41ed383fe458ba39b3f7a Mon Sep 17 00:00:00 2001
 From: NelloKudo <marshnelloosu@gmail.com>
 Date: Sun, 15 Feb 2026 00:19:49 +0100
-Subject: [PATCH 07/11] wdfldr.sys: Populate function table for
+Subject: [PATCH 06/10] wdfldr.sys: Populate function table for
  WdfDriverMiniportUnload.
 
 Co-authored-by: Quitting <quitthefake@gmail.com>
@@ -10,7 +10,7 @@ Co-authored-by: Quitting <quitthefake@gmail.com>
  1 file changed, 16 insertions(+), 1 deletion(-)
 
 diff --git a/dlls/wdfldr.sys/wdfldr_main.c b/dlls/wdfldr.sys/wdfldr_main.c
-index dd370237ed6..b50e81cee0c 100644
+index 05eef9932dc..dbaf81470a6 100644
 --- a/dlls/wdfldr.sys/wdfldr_main.c
 +++ b/dlls/wdfldr.sys/wdfldr_main.c
 @@ -89,6 +89,12 @@ static WDFLDR_CLIENT_INFO *find_client_info(DRIVER_OBJECT *driver)

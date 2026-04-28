@@ -1,4 +1,4 @@
-From a4a1b8da34714421388ba4cbf7ee4670dd8e8210 Mon Sep 17 00:00:00 2001
+From bd233625bf54226959c5b2f36d70b82ab71ff0b1 Mon Sep 17 00:00:00 2001
 From: Etaash Mathamsetty
  <45927311+Etaash-mathamsetty@users.noreply.github.com>
 Date: Wed, 23 Jul 2025 12:39:47 -0400
@@ -11,10 +11,10 @@ Subject: [PATCH 15/18] fixup! ntoskrnl: SeLocateProcessImageName.
  3 files changed, 62 insertions(+), 21 deletions(-)
 
 diff --git a/dlls/ntoskrnl.exe/ntoskrnl.c b/dlls/ntoskrnl.exe/ntoskrnl.c
-index 1c8379b83b6..5cf7658f6ad 100644
+index 377692ac5a5..131c1abd867 100644
 --- a/dlls/ntoskrnl.exe/ntoskrnl.c
 +++ b/dlls/ntoskrnl.exe/ntoskrnl.c
-@@ -2494,7 +2494,7 @@ static void *create_process_object( HANDLE handle )
+@@ -2483,7 +2483,7 @@ static void *create_process_object( HANDLE handle )
      HANDLE token;
      PEPROCESS process;
      ANSI_STRING fullImageNameA;
@@ -23,7 +23,7 @@ index 1c8379b83b6..5cf7658f6ad 100644
  
      if (!(process = alloc_kernel_object( PsProcessType, handle, sizeof(*process), 0 ))) return NULL;
  
-@@ -2505,15 +2505,12 @@ static void *create_process_object( HANDLE handle )
+@@ -2494,15 +2494,12 @@ static void *create_process_object( HANDLE handle )
      NtQueryInformationProcess( handle, ProcessTimes, &process->times, sizeof(process->times), NULL );
  
      /* get full image name */
@@ -45,7 +45,7 @@ index 1c8379b83b6..5cf7658f6ad 100644
      if (!fullImageNameA.Buffer) return NULL;
      /* generate short name */
      for (p = fullImageNameA.Buffer + fullImageNameA.Length - 1; p >= fullImageNameA.Buffer; p--)
-@@ -2526,6 +2523,7 @@ static void *create_process_object( HANDLE handle )
+@@ -2515,6 +2512,7 @@ static void *create_process_object( HANDLE handle )
      }
      memcpy(process->imageName, p, min(fullImageNameA.Buffer + fullImageNameA.Length - p, sizeof(process->imageName)));
      RtlFreeAnsiString(&fullImageNameA);
@@ -53,7 +53,7 @@ index 1c8379b83b6..5cf7658f6ad 100644
  
      IsWow64Process( handle, &process->wow64 );
  
-@@ -2539,8 +2537,11 @@ static void *create_process_object( HANDLE handle )
+@@ -2528,8 +2526,11 @@ static void *create_process_object( HANDLE handle )
  void release_process_object(void *obj)
  {
      PEPROCESS process = obj;
@@ -67,7 +67,7 @@ index 1c8379b83b6..5cf7658f6ad 100644
  
      SERVER_START_REQ( release_kernel_object )
      {
-@@ -2763,11 +2764,10 @@ HANDLE WINAPI PsGetThreadProcessId( PETHREAD thread )
+@@ -2752,11 +2753,10 @@ HANDLE WINAPI PsGetThreadProcessId( PETHREAD thread )
   */
  NTSTATUS WINAPI PsGetContextThread(PETHREAD thread, CONTEXT *context)
  {
@@ -81,7 +81,7 @@ index 1c8379b83b6..5cf7658f6ad 100644
          return STATUS_NOT_FOUND;
  
      status = NtGetContextThread(handle, context);
-@@ -3116,6 +3116,18 @@ PHYSICAL_ADDRESS WINAPI MmGetPhysicalAddress(void *virtual_address)
+@@ -3105,6 +3105,18 @@ PHYSICAL_ADDRESS WINAPI MmGetPhysicalAddress(void *virtual_address)
      return ret;
  }
  
@@ -100,7 +100,7 @@ index 1c8379b83b6..5cf7658f6ad 100644
  /***********************************************************************
   *           MmGetVirtualForPhysical   (NTOSKRNL.EXE.@)
   */
-@@ -4522,18 +4534,42 @@ BOOLEAN WINAPI SePrivilegeCheck(PRIVILEGE_SET *privileges, SECURITY_SUBJECT_CONT
+@@ -4523,18 +4535,42 @@ BOOLEAN WINAPI SePrivilegeCheck(PRIVILEGE_SET *privileges, SECURITY_SUBJECT_CONT
   */
  NTSTATUS WINAPI SeLocateProcessImageName(PEPROCESS process, UNICODE_STRING **image_name)
  {
@@ -147,10 +147,10 @@ index 1c8379b83b6..5cf7658f6ad 100644
  }
  
 diff --git a/dlls/ntoskrnl.exe/ntoskrnl.exe.spec b/dlls/ntoskrnl.exe/ntoskrnl.exe.spec
-index 574a8cbae0b..2ed1a43909e 100644
+index 96d4b8bfb76..a740cba6e4a 100644
 --- a/dlls/ntoskrnl.exe/ntoskrnl.exe.spec
 +++ b/dlls/ntoskrnl.exe/ntoskrnl.exe.spec
-@@ -726,7 +726,7 @@
+@@ -728,7 +728,7 @@
  @ stdcall MmFreeNonCachedMemory(ptr long)
  @ stub MmFreePagesFromMdl
  @ stdcall MmGetPhysicalAddress(ptr)
@@ -160,7 +160,7 @@ index 574a8cbae0b..2ed1a43909e 100644
  @ stdcall MmGetVirtualForPhysical(int64)
  @ stub MmGrowKernelStack
 diff --git a/dlls/ntoskrnl.exe/ntoskrnl_private.h b/dlls/ntoskrnl.exe/ntoskrnl_private.h
-index 10aebe722de..14d5a3a4e29 100644
+index 471a867fc35..1b8625f91b4 100644
 --- a/dlls/ntoskrnl.exe/ntoskrnl_private.h
 +++ b/dlls/ntoskrnl.exe/ntoskrnl_private.h
 @@ -56,9 +56,8 @@ struct _EPROCESS

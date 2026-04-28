@@ -1,7 +1,7 @@
-From f6eeb026eb0c3b63394a9608256ba17816b1af8a Mon Sep 17 00:00:00 2001
+From ee3bdda5dc4d59b5dcdb93a570f0f27eb627cbc8 Mon Sep 17 00:00:00 2001
 From: NelloKudo <marshnelloosu@gmail.com>
 Date: Tue, 10 Mar 2026 21:17:54 +0100
-Subject: [PATCH 10/11] HACK: kernelbase: Delay return for VersionService.exe.
+Subject: [PATCH 08/10] HACK: kernelbase: Delay return for VersionService.exe.
 
 VersionService.exe, used in miniloader games launchers (e.g. Nikke), relies on using a pipe
 that by the time CreateProcess returns is not up yet: simply delaying the return workarounds the issue.
@@ -10,10 +10,10 @@ that by the time CreateProcess returns is not up yet: simply delaying the return
  1 file changed, 9 insertions(+)
 
 diff --git a/dlls/kernelbase/process.c b/dlls/kernelbase/process.c
-index 7e1eb976345..fa987143ddb 100644
+index 8be6c7e785b..f9d64cd35c5 100644
 --- a/dlls/kernelbase/process.c
 +++ b/dlls/kernelbase/process.c
-@@ -986,6 +986,15 @@ BOOL WINAPI DECLSPEC_HOTPATCH CreateProcessInternalW( HANDLE token, const WCHAR
+@@ -944,6 +944,15 @@ BOOL WINAPI DECLSPEC_HOTPATCH CreateProcessInternalW( HANDLE token, const WCHAR
      RtlDestroyProcessParameters( params );
      if (tidy_cmdline != cmd_line) HeapFree( GetProcessHeap(), 0, tidy_cmdline );
      HeapFree( GetProcessHeap(), 0, product_name );

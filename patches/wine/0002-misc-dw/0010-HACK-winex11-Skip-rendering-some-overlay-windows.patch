@@ -1,7 +1,7 @@
-From 6f8789c61a8e55df43cef2d9b666310b86a5a0c8 Mon Sep 17 00:00:00 2001
+From 32fdaa86af0010391a00f9b6d12355c0579d76e6 Mon Sep 17 00:00:00 2001
 From: NelloKudo <marshnelloosu@gmail.com>
 Date: Sun, 26 Apr 2026 23:18:43 +0200
-Subject: [PATCH] HACK: winex11: Skip rendering some overlay windows.
+Subject: [PATCH 10/10] HACK: winex11: Skip rendering some overlay windows.
 
 Fixes issues with a few overlay windows staying over interaction buttons in
 a few game launchers depending on the compositor (e.g. NTE).
@@ -10,10 +10,10 @@ a few game launchers depending on the compositor (e.g. NTE).
  1 file changed, 15 insertions(+), 1 deletion(-)
 
 diff --git a/dlls/winex11.drv/window.c b/dlls/winex11.drv/window.c
-index 4bd2006f4b8..d6bdc2f0769 100644
+index 367241888d1..2ccafb0d366 100644
 --- a/dlls/winex11.drv/window.c
 +++ b/dlls/winex11.drv/window.c
-@@ -1690,6 +1690,17 @@ static int skip_iconify(void)
+@@ -1777,6 +1777,17 @@ static int skip_iconify(void)
      return cached;
  }
  
@@ -31,7 +31,7 @@ index 4bd2006f4b8..d6bdc2f0769 100644
  static void window_set_wm_state( struct x11drv_win_data *data, UINT new_state, BOOL activate )
  {
      UINT old_state = data->pending_state.wm_state;
-@@ -1773,7 +1784,10 @@ static void window_set_wm_state( struct x11drv_win_data *data, UINT new_state, B
+@@ -1855,7 +1866,10 @@ static void window_set_wm_state( struct x11drv_win_data *data, UINT new_state, B
      case MAKELONG(WithdrawnState, NormalState):
      case MAKELONG(IconicState, NormalState):
          if (data->embedded) set_xembed_flags( data, XEMBED_MAPPED );
@@ -44,5 +44,5 @@ index 4bd2006f4b8..d6bdc2f0769 100644
      case MAKELONG(NormalState, WithdrawnState):
      case MAKELONG(IconicState, WithdrawnState):
 -- 
-2.53.0
+2.54.0
 

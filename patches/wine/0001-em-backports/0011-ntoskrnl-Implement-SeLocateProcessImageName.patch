@@ -1,4 +1,4 @@
-From 1cc30c91d445e64c91f411fbbd8c1fa462eb82ad Mon Sep 17 00:00:00 2001
+From 09d794b30823c8f40c6b1315190e7a6016c302c9 Mon Sep 17 00:00:00 2001
 From: Etaash Mathamsetty
  <45927311+Etaash-mathamsetty@users.noreply.github.com>
 Date: Tue, 22 Jul 2025 23:32:46 -0400
@@ -10,10 +10,10 @@ Subject: [PATCH 11/18] ntoskrnl: Implement SeLocateProcessImageName.
  2 files changed, 47 insertions(+), 7 deletions(-)
 
 diff --git a/dlls/ntoskrnl.exe/ntoskrnl.c b/dlls/ntoskrnl.exe/ntoskrnl.c
-index 45294536949..27f246cc539 100644
+index e8aeb97a738..18aedaf8908 100644
 --- a/dlls/ntoskrnl.exe/ntoskrnl.c
 +++ b/dlls/ntoskrnl.exe/ntoskrnl.c
-@@ -2489,9 +2489,10 @@ NTSTATUS WINAPI FsRtlRegisterUncProvider(PHANDLE MupHandle, PUNICODE_STRING Redi
+@@ -2478,9 +2478,10 @@ NTSTATUS WINAPI FsRtlRegisterUncProvider(PHANDLE MupHandle, PUNICODE_STRING Redi
  
  static void *create_process_object( HANDLE handle )
  {
@@ -25,7 +25,7 @@ index 45294536949..27f246cc539 100644
  
      if (!(process = alloc_kernel_object( PsProcessType, handle, sizeof(*process), 0 ))) return NULL;
  
-@@ -2501,24 +2502,52 @@ static void *create_process_object( HANDLE handle )
+@@ -2490,24 +2491,52 @@ static void *create_process_object( HANDLE handle )
      NtQueryInformationProcess( handle, ProcessSessionInformation, &process->session_id, sizeof(process->session_id), NULL );
      NtQueryInformationProcess( handle, ProcessTimes, &process->times, sizeof(process->times), NULL );
  
@@ -80,7 +80,7 @@ index 45294536949..27f246cc539 100644
  };
  
  POBJECT_TYPE PsProcessType = &process_type;
-@@ -4456,9 +4485,19 @@ BOOLEAN WINAPI SePrivilegeCheck(PRIVILEGE_SET *privileges, SECURITY_SUBJECT_CONT
+@@ -4457,9 +4486,19 @@ BOOLEAN WINAPI SePrivilegeCheck(PRIVILEGE_SET *privileges, SECURITY_SUBJECT_CONT
   */
  NTSTATUS WINAPI SeLocateProcessImageName(PEPROCESS process, UNICODE_STRING **image_name)
  {
@@ -104,7 +104,7 @@ index 45294536949..27f246cc539 100644
  
  /*********************************************************************
 diff --git a/dlls/ntoskrnl.exe/ntoskrnl_private.h b/dlls/ntoskrnl.exe/ntoskrnl_private.h
-index c7bcce2c7e3..f75ff74d55c 100644
+index fc1a9283633..f0c0f82aeaa 100644
 --- a/dlls/ntoskrnl.exe/ntoskrnl_private.h
 +++ b/dlls/ntoskrnl.exe/ntoskrnl_private.h
 @@ -57,7 +57,8 @@ struct _EPROCESS

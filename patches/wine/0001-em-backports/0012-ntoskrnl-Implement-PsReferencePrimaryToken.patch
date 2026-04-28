@@ -1,4 +1,4 @@
-From f5d9aa6e0049800b9c07d21cdc40af3c9682a342 Mon Sep 17 00:00:00 2001
+From 4a4d719fc11464bf432a25e01517baf466924fbd Mon Sep 17 00:00:00 2001
 From: Etaash Mathamsetty
  <45927311+Etaash-mathamsetty@users.noreply.github.com>
 Date: Wed, 23 Jul 2025 00:34:32 -0400
@@ -11,10 +11,10 @@ Subject: [PATCH 12/18] ntoskrnl: Implement PsReferencePrimaryToken.
  3 files changed, 18 insertions(+), 1 deletion(-)
 
 diff --git a/dlls/ntoskrnl.exe/ntoskrnl.c b/dlls/ntoskrnl.exe/ntoskrnl.c
-index 27f246cc539..df2c8f5bf5f 100644
+index 18aedaf8908..232c0c650ea 100644
 --- a/dlls/ntoskrnl.exe/ntoskrnl.c
 +++ b/dlls/ntoskrnl.exe/ntoskrnl.c
-@@ -2490,6 +2490,7 @@ NTSTATUS WINAPI FsRtlRegisterUncProvider(PHANDLE MupHandle, PUNICODE_STRING Redi
+@@ -2479,6 +2479,7 @@ NTSTATUS WINAPI FsRtlRegisterUncProvider(PHANDLE MupHandle, PUNICODE_STRING Redi
  static void *create_process_object( HANDLE handle )
  {
      ULONG len;
@@ -22,7 +22,7 @@ index 27f246cc539..df2c8f5bf5f 100644
      PEPROCESS process;
      ANSI_STRING imageNameA;
      UNICODE_STRING imageNameW, fullImageName;
-@@ -2522,6 +2523,10 @@ static void *create_process_object( HANDLE handle )
+@@ -2511,6 +2512,10 @@ static void *create_process_object( HANDLE handle )
                                 sizeof(fullImageName) + fullImageName.MaximumLength, NULL );
      process->fullImageName = fullImageName;
  
@@ -33,7 +33,7 @@ index 27f246cc539..df2c8f5bf5f 100644
      IsWow64Process( handle, &process->wow64 );
  
      return process;
-@@ -2531,6 +2536,7 @@ void release_process_object(void *obj)
+@@ -2520,6 +2525,7 @@ void release_process_object(void *obj)
  {
      PEPROCESS process = obj;
      ExFreePool(process->fullImageName.Buffer);
@@ -41,7 +41,7 @@ index 27f246cc539..df2c8f5bf5f 100644
  
      SERVER_START_REQ( release_kernel_object )
      {
-@@ -2626,6 +2632,16 @@ const char *WINAPI PsGetProcessImageFileName( PEPROCESS process )
+@@ -2615,6 +2621,16 @@ const char *WINAPI PsGetProcessImageFileName( PEPROCESS process )
      return process->imageName;
  }
  
@@ -59,10 +59,10 @@ index 27f246cc539..df2c8f5bf5f 100644
  {
      THREAD_BASIC_INFORMATION info;
 diff --git a/dlls/ntoskrnl.exe/ntoskrnl.exe.spec b/dlls/ntoskrnl.exe/ntoskrnl.exe.spec
-index 0106c569199..b9906bef824 100644
+index f349421bc11..fceb4be5451 100644
 --- a/dlls/ntoskrnl.exe/ntoskrnl.exe.spec
 +++ b/dlls/ntoskrnl.exe/ntoskrnl.exe.spec
-@@ -957,7 +957,7 @@
+@@ -960,7 +960,7 @@
  @ stdcall PsLookupThreadByThreadId(ptr ptr)
  @ extern PsProcessType
  @ stub PsReferenceImpersonationToken
@@ -72,7 +72,7 @@ index 0106c569199..b9906bef824 100644
  @ stdcall PsReleaseProcessExitSynchronization(ptr)
  @ stdcall PsRemoveCreateThreadNotifyRoutine(ptr)
 diff --git a/dlls/ntoskrnl.exe/ntoskrnl_private.h b/dlls/ntoskrnl.exe/ntoskrnl_private.h
-index f75ff74d55c..10aebe722de 100644
+index f0c0f82aeaa..471a867fc35 100644
 --- a/dlls/ntoskrnl.exe/ntoskrnl_private.h
 +++ b/dlls/ntoskrnl.exe/ntoskrnl_private.h
 @@ -57,6 +57,7 @@ struct _EPROCESS

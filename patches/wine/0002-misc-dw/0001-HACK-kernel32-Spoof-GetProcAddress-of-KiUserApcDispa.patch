@@ -1,7 +1,7 @@
-From bad28386ca0cc5200af3e0b35162d49f07d05c82 Mon Sep 17 00:00:00 2001
+From c429e03173e439d37b668671bcd9a8a3fd9362ba Mon Sep 17 00:00:00 2001
 From: Ziia Shi <mkrsym1@gmail.com>
 Date: Tue, 20 Jan 2026 16:33:26 +0100
-Subject: [PATCH 02/11] HACK: kernel32: Spoof GetProcAddress of
+Subject: [PATCH 01/10] HACK: kernel32: Spoof GetProcAddress of
  KiUserApcDispatcher and KiUserCallbackDispatcher.
 
 ---

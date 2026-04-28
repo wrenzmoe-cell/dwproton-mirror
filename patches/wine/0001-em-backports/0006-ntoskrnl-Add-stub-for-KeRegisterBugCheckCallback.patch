@@ -1,4 +1,4 @@
-From e2781a48731fc9e843da4124827f27bbc0e81de4 Mon Sep 17 00:00:00 2001
+From 4f9bea9bb9942a3578914b1e8914046c06800655 Mon Sep 17 00:00:00 2001
 From: Etaash Mathamsetty
  <45927311+Etaash-mathamsetty@users.noreply.github.com>
 Date: Tue, 22 Jul 2025 16:48:42 -0400
@@ -10,10 +10,10 @@ Subject: [PATCH 06/18] ntoskrnl: Add stub for KeRegisterBugCheckCallback.
  2 files changed, 12 insertions(+), 1 deletion(-)
 
 diff --git a/dlls/ntoskrnl.exe/ntoskrnl.c b/dlls/ntoskrnl.exe/ntoskrnl.c
-index c4dfb4eb1be..e03b42b26b2 100644
+index 2b7379618d0..380e190b03b 100644
 --- a/dlls/ntoskrnl.exe/ntoskrnl.c
 +++ b/dlls/ntoskrnl.exe/ntoskrnl.c
-@@ -2864,6 +2864,17 @@ void WINAPI KeRevertToUserAffinityThreadEx(KAFFINITY affinity)
+@@ -2853,6 +2853,17 @@ void WINAPI KeRevertToUserAffinityThreadEx(KAFFINITY affinity)
      thread->user_affinity = affinity;
  }
  
@@ -32,10 +32,10 @@ index c4dfb4eb1be..e03b42b26b2 100644
   *           IoRegisterFileSystem   (NTOSKRNL.EXE.@)
   */
 diff --git a/dlls/ntoskrnl.exe/ntoskrnl.exe.spec b/dlls/ntoskrnl.exe/ntoskrnl.exe.spec
-index e2f153ab41a..df769343e6d 100644
+index 5410cbbb52e..6a3dab29313 100644
 --- a/dlls/ntoskrnl.exe/ntoskrnl.exe.spec
 +++ b/dlls/ntoskrnl.exe/ntoskrnl.exe.spec
-@@ -628,7 +628,7 @@
+@@ -630,7 +630,7 @@
  @ stub KeReadStateQueue
  @ stub KeReadStateSemaphore
  @ stub KeReadStateTimer

@@ -1,14 +1,14 @@
-From 5f587b13c0329d32eea3deee2e8ed6e77d2e4d96 Mon Sep 17 00:00:00 2001
+From 2ff0d0d96b56b288a7ab052a49e0e4eb01312aeb Mon Sep 17 00:00:00 2001
 From: NelloKudo <marshnelloosu@gmail.com>
 Date: Sun, 15 Feb 2026 00:15:26 +0100
-Subject: [PATCH 06/11] wdfldr.sys: Semi-implement WdfVersionBind.
+Subject: [PATCH 05/10] wdfldr.sys: Semi-implement WdfVersionBind.
 
 ---
  dlls/wdfldr.sys/wdfldr_main.c | 83 ++++++++++++++++++++++++++++++++++-
  1 file changed, 81 insertions(+), 2 deletions(-)
 
 diff --git a/dlls/wdfldr.sys/wdfldr_main.c b/dlls/wdfldr.sys/wdfldr_main.c
-index 419c50b1b44..dd370237ed6 100644
+index 419c50b1b44..05eef9932dc 100644
 --- a/dlls/wdfldr.sys/wdfldr_main.c
 +++ b/dlls/wdfldr.sys/wdfldr_main.c
 @@ -77,11 +77,90 @@ static inline LPCSTR debugstr_us( const UNICODE_STRING *us )
@@ -35,8 +35,8 @@ index 419c50b1b44..dd370237ed6 100644
 +    WDFLDR_CLIENT_INFO *client_info;
 +    NTSTATUS status = STATUS_SUCCESS;
 +
-+    TRACE("%p %s version %u.%u.%u, %u functions\n", driver, debugstr_us(reg_path),
-+            bind_info->Version.Major, bind_info->Version.Minor, 
++    TRACE("%p %s version %lu.%lu.%lu, %lu functions\n", driver, debugstr_us(reg_path),
++            bind_info->Version.Major, bind_info->Version.Minor,
 +            bind_info->Version.Build, bind_info->FuncCount);
 +
 +    if (!driver || !reg_path || !bind_info || !component_globals)

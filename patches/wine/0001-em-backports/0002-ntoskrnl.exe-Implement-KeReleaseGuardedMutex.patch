@@ -1,4 +1,4 @@
-From 2d789c46c5966eacc952f27ab9fac75296330327 Mon Sep 17 00:00:00 2001
+From 51f15582385b7a2501266d1c386d8b7ad094cd9c Mon Sep 17 00:00:00 2001
 From: Etaash Mathamsetty <etaash.mathamsetty@gmail.com>
 Date: Thu, 26 Jan 2023 15:09:21 -0500
 Subject: [PATCH 02/18] ntoskrnl.exe: Implement KeReleaseGuardedMutex.
@@ -9,7 +9,7 @@ Subject: [PATCH 02/18] ntoskrnl.exe: Implement KeReleaseGuardedMutex.
  2 files changed, 25 insertions(+)
 
 diff --git a/dlls/ntoskrnl.exe/ntoskrnl.exe.spec b/dlls/ntoskrnl.exe/ntoskrnl.exe.spec
-index 8d43837a233..1c697770558 100644
+index 1b0acd88ff5..eb4a19b5dd7 100644
 --- a/dlls/ntoskrnl.exe/ntoskrnl.exe.spec
 +++ b/dlls/ntoskrnl.exe/ntoskrnl.exe.spec
 @@ -60,6 +60,8 @@
@@ -22,10 +22,10 @@ index 8d43837a233..1c697770558 100644
  @ stub KefAcquireSpinLockAtDpcLevel
  @ stub KefReleaseSpinLockFromDpcLevel
 diff --git a/dlls/ntoskrnl.exe/sync.c b/dlls/ntoskrnl.exe/sync.c
-index 331c3e1bce2..a06bfcc05b6 100644
+index b9484a7d1a8..4674a3a8924 100644
 --- a/dlls/ntoskrnl.exe/sync.c
 +++ b/dlls/ntoskrnl.exe/sync.c
-@@ -462,6 +462,29 @@ void WINAPI KeAcquireGuardedMutex(PKGUARDED_MUTEX mutex)
+@@ -461,6 +461,29 @@ void WINAPI KeAcquireGuardedMutex(PKGUARDED_MUTEX mutex)
      KeAcquireGuardedMutexUnsafe(mutex);
  }
  

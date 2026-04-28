@@ -1,4 +1,4 @@
-From a4a8d84af43c73349b9100b3408e2f6b784ecec8 Mon Sep 17 00:00:00 2001
+From 5cf85ae5197d536b821acf75c4aefcca6aa3532f Mon Sep 17 00:00:00 2001
 From: Etaash Mathamsetty <etaash.mathamsetty@gmail.com>
 Date: Thu, 26 Jan 2023 15:07:16 -0500
 Subject: [PATCH 01/18] ntoskrnl.exe: Implement KeAcquireGuardedMutex.
@@ -9,7 +9,7 @@ Subject: [PATCH 01/18] ntoskrnl.exe: Implement KeAcquireGuardedMutex.
  2 files changed, 25 insertions(+)
 
 diff --git a/dlls/ntoskrnl.exe/ntoskrnl.exe.spec b/dlls/ntoskrnl.exe/ntoskrnl.exe.spec
-index 89f498db32c..8d43837a233 100644
+index b906a287e43..1b0acd88ff5 100644
 --- a/dlls/ntoskrnl.exe/ntoskrnl.exe.spec
 +++ b/dlls/ntoskrnl.exe/ntoskrnl.exe.spec
 @@ -52,6 +52,8 @@
@@ -22,10 +22,10 @@ index 89f498db32c..8d43837a233 100644
  @ stdcall KeExpandKernelStackAndCallout(ptr ptr long)
  @ stdcall KeExpandKernelStackAndCalloutEx(ptr ptr long long ptr)
 diff --git a/dlls/ntoskrnl.exe/sync.c b/dlls/ntoskrnl.exe/sync.c
-index d9b5726b920..331c3e1bce2 100644
+index 2183df351b2..b9484a7d1a8 100644
 --- a/dlls/ntoskrnl.exe/sync.c
 +++ b/dlls/ntoskrnl.exe/sync.c
-@@ -439,6 +439,29 @@ void WINAPI KeInitializeGuardedMutex(PKGUARDED_MUTEX mutex)
+@@ -438,6 +438,29 @@ void WINAPI KeInitializeGuardedMutex(PKGUARDED_MUTEX mutex)
      KeInitializeEvent(&mutex->Event, SynchronizationEvent, FALSE);
  }
  

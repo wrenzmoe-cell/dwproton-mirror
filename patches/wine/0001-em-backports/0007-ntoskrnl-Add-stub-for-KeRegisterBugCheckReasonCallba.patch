@@ -1,4 +1,4 @@
-From f36f8a29fa6658ce3cdc7559ca95bd0ac9ddd13e Mon Sep 17 00:00:00 2001
+From 0d65d7e48e1e2b9e2a0b67916109c34a0fc1d46c Mon Sep 17 00:00:00 2001
 From: Etaash Mathamsetty
  <45927311+Etaash-mathamsetty@users.noreply.github.com>
 Date: Tue, 22 Jul 2025 16:53:06 -0400
@@ -11,10 +11,10 @@ Subject: [PATCH 07/18] ntoskrnl: Add stub for
  2 files changed, 11 insertions(+), 1 deletion(-)
 
 diff --git a/dlls/ntoskrnl.exe/ntoskrnl.c b/dlls/ntoskrnl.exe/ntoskrnl.c
-index e03b42b26b2..22fbe1566be 100644
+index 380e190b03b..c8d629dbda1 100644
 --- a/dlls/ntoskrnl.exe/ntoskrnl.c
 +++ b/dlls/ntoskrnl.exe/ntoskrnl.c
-@@ -2875,6 +2875,16 @@ BOOL WINAPI KeRegisterBugCheckCallback(void *record, void *routine,
+@@ -2864,6 +2864,16 @@ BOOL WINAPI KeRegisterBugCheckCallback(void *record, void *routine,
      return TRUE;
  }
  
@@ -32,10 +32,10 @@ index e03b42b26b2..22fbe1566be 100644
   *           IoRegisterFileSystem   (NTOSKRNL.EXE.@)
   */
 diff --git a/dlls/ntoskrnl.exe/ntoskrnl.exe.spec b/dlls/ntoskrnl.exe/ntoskrnl.exe.spec
-index df769343e6d..d5ad6749b45 100644
+index 6a3dab29313..5feb9c79046 100644
 --- a/dlls/ntoskrnl.exe/ntoskrnl.exe.spec
 +++ b/dlls/ntoskrnl.exe/ntoskrnl.exe.spec
-@@ -629,7 +629,7 @@
+@@ -631,7 +631,7 @@
  @ stub KeReadStateSemaphore
  @ stub KeReadStateTimer
  @ stdcall KeRegisterBugCheckCallback(ptr ptr ptr long ptr)
