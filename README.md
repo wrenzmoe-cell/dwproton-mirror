@@ -28,6 +28,7 @@ New environment variables
   - `WINE_USE_TAKE_FOCUS=1`: enables a fix for games dropping inputs after alt-tab
   - `WINE_DISABLE_DISCONNECT=1`: disable the disconnecting trick enabled by default for certain games
   - `WINE_ENABLE_DISCONNECT=1`: enable the disconnecting trick for any game
+  - `WINE_ENABLE_TIMEOUT_FIX=1`: enables a fix for setups struggling to launch GI due to connection issues
 
 We recommend using `UMU_USE_STEAM=1` when launching GI/ZZZ outside of Steam, if the automation doesn't work.
 
