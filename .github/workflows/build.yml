@@ -34,9 +34,9 @@ jobs:
             --without-tts \
             --without-nvidia-libs \
             --without-wayland-libs \
-            --without-libpcap[cite: 1]
+            --without-libpcap
 
-          make -j$(nproc) redist[cite: 1]
+          make -j$(nproc) redist
 
       - name: Package Result
         run: |
