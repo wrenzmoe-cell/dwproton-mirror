@@ -1,12 +1,6 @@
 name: Release
-
 on:
-  release:
-    types: [ published ]
-  push:
-    tags:
-      - 'cachyos-*-*-slr'
-
+  workflow_dispatch: 
 concurrency:
   group: ${{ github.ref_name }}
   cancel-in-progress: true
