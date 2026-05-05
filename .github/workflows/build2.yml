@@ -1,55 +1,73 @@
-name: Build dwproton 11.0-1 ARM64 (4K Paging) Source-Matched
+name: Release
 
 on:
-  workflow_dispatch:
+  release:
+    types: [ published ]
+  push:
+    tags:
+      - 'cachyos-*-*-slr'
+
+concurrency:
+  group: ${{ github.ref_name }}
+  cancel-in-progress: true
 
 jobs:
   build:
+    name: Build
+    strategy:
+      matrix:
+        include:
+          - name: proton-${{ github.ref_name }}-arm64
+            configure: >-
+              --without-nvidia-libs
+              --target-arch=arm64
+            runner: 'ubuntu-24.04'
+    uses: ./.github/workflows/_job_build.yml
+    with:
+      name: ${{ matrix.name }}
+      cflags: ${{ matrix.cflags }}
+      rustflags: ${{ matrix.rustflags }}
+      configure: ${{ matrix.configure }}
+      runner: ${{ matrix.runner }}
+      continue: false
+
+  release:
+    name: Release
+    needs: build
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout Source
-        uses: actions/checkout@v4
-        with:
-          ref: 'dwproton/11.0-1'
-          submodules: recursive
-          fetch-depth: 1
+    - uses: actions/checkout@v6
+      with:
+        fetch-depth: 0
+        fetch-tags: true
+    - name: Title
+      id: title
+      shell: bash
+      run: |
+        git fetch origin +refs/tags/*:refs/tags/*
+        python -c "v='${{ github.ref_name }}'.split('-');print('title='+'-'.join([v[1],v[2]]))" >> "$GITHUB_OUTPUT"
+    - name: Create
+      id: create
+      shell: bash
+      run: >-
+        gh
+        release create
+        ${{ github.ref_name }}
+        --latest
+        --title "Version ${{ steps.title.outputs.title }}"
+        --notes-from-tag
+        --verify-tag
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-        with:
-          platforms: arm64
-
-      - name: Free Disk Space
-        run: |
-          sudo rm -rf /usr/share/dotnet /opt/ghc "/usr/local/share/boost" "$AGENT_TOOLSDIRECTORY"
-          docker image prune -af
-
-      - name: Build dwproton
-        run: |
-          export LDFLAGS="-Wl,-z,common-page-size=4096 -Wl,-z,max-page-size=4096"
-          export CROSS_LDFLAGS="-Wl,-z,max-page-size=4096"
-          
-          sed -i '/check_container_engine() {/,/}/c\check_container_engine() { stat "Bypassing check for x86-on-arm64"; ROOTLESS_CONTAINER=1; return 0; }' configure.sh
-          
-          mkdir -p build && cd build
-          
-          ../configure.sh \
-            --build-name="dwproton-11-asahi-4k" \
-            --target-arch=arm64 \
-            --container-engine=docker \
-            --docker-opts="--platform linux/arm64" \
-            --relabel-volumes \
-            --without-tts
-
-          make -j$(nproc) redist
-
-      - name: Package and Upload
-        run: |
-          tar -czvf dwproton-11.0-1-arm64-4k.tar.gz -C build/redist .
-          
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: dwproton-11.0-1-arm64-4k
-          path: dwproton-11.0-1-arm64-4k.tar.gz
+  upload:
+    name: Upload
+    needs: release
+    strategy:
+      matrix:
+        include:
+          - name: proton-${{ github.ref_name }}-arm64
+    uses: ./.github/workflows/_job_upload.yml
+    with:
+      version: ${{ github.ref_name }}
+      name: ${{ matrix.name }}
