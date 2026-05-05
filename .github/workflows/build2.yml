@@ -27,20 +27,13 @@ jobs:
 
       - name: Build dwproton
         run: |
-          # 1. 注入 4K 分页支持，这是 M1 Pro (Asahi) 运行的核心
           export LDFLAGS="-Wl,-z,common-page-size=4096 -Wl,-z,max-page-size=4096"
           export CROSS_LDFLAGS="-Wl,-z,max-page-size=4096"
           
-          # 2. 针对源码 进行精准热补丁
-          # 脚本第 70-73 行通过 docker run 获取 inner_uid
-          # 我们直接强制让 check_container_engine 函数返回成功，并手动设定 ROOTLESS_CONTAINER
-          # 这样脚本就不会再去调用那个会报错的 docker run 探测逻辑了
           sed -i '/check_container_engine() {/,/}/c\check_container_engine() { stat "Bypassing check for x86-on-arm64"; ROOTLESS_CONTAINER=1; return 0; }' configure.sh
           
-          # 3. 创建构建目录并配置
           mkdir -p build && cd build
           
-          # 传递 --docker-opts="--platform linux/arm64" 确保后续 make 过程中的 docker 调用不会再报警告
           ../configure.sh \
             --build-name="dwproton-11-asahi-4k" \
             --target-arch=arm64 \
@@ -49,8 +42,6 @@ jobs:
             --relabel-volumes \
             --without-tts
 
-          # 4. 编译产物
-          # redist 目标会自动处理所有构建
           make -j$(nproc) redist
 
       - name: Package and Upload
