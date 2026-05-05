@@ -1,0 +1,60 @@
+name: Build dwproton 11.0-1 ARM64 (4K Paging) Final
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+        with:
+          ref: 'dwproton/11.0-1'
+          submodules: recursive
+          fetch-depth: 1
+
+      - name: Free Disk Space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: true
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+          swap-storage: true
+      
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64
+
+      - name: Build dwproton
+        run: |
+          export LDFLAGS="-Wl,-z,common-page-size=4096 -Wl,-z,max-page-size=4096"
+          export CROSS_LDFLAGS="-Wl,-z,max-page-size=4096"
+          
+          mkdir build && cd build
+          
+          ../configure.sh \
+            --build-name="dwproton-11-asahi-4k" \
+            --target-arch=arm64 \
+            --container-engine=docker \
+            --without-tts \
+            --without-nvidia-libs \
+            --without-wayland-libs \
+            --without-libpcap
+
+          make -j$(nproc) redist
+
+      - name: Package Result
+        run: |
+          tar -czvf dwproton-11.0-1-arm64-4k.tar.gz -C build/redist .
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dwproton-11.0-1-arm64-4k
+          path: dwproton-11.0-1-arm64-4k.tar.gz
