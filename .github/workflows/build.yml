@@ -1,4 +1,4 @@
-name: Build dwproton 11.0-1 ARM64 (4K Paging) on x86_64 Runner
+name: Build dwproton 11.0-1 ARM64 (4K Paging) Final
 
 on:
   workflow_dispatch:
@@ -21,7 +21,7 @@ jobs:
           platforms: arm64
 
       - name: Build dwproton
-        run: |          
+        run: |
           export LDFLAGS="-Wl,-z,common-page-size=4096 -Wl,-z,max-page-size=4096"
           export CROSS_LDFLAGS="-Wl,-z,max-page-size=4096"
           
@@ -29,10 +29,12 @@ jobs:
           
           ../configure.sh \
             --build-name="dwproton-11-asahi-4k" \
-            --container-engine=docker \
             --target-arch=arm64 \
+            --container-engine=docker \
             --without-tts \
-            --enable-ccache[cite: 1]
+            --without-nvidia-libs \
+            --without-wayland-libs \
+            --without-libpcap[cite: 1]
 
           make -j$(nproc) redist[cite: 1]
 
