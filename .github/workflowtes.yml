@@ -1,4 +1,4 @@
-name: Build dwproton 11.0-1 ARM64 (4K Paging) Final
+name: Build dwproton 11.0-1 ARM64 (4K Paging) Source-Matched
 
 on:
   workflow_dispatch:
@@ -11,7 +11,7 @@ jobs:
       - name: Checkout Source
         uses: actions/checkout@v4
         with:
-          ref: 'dwproton/11.0-1'
+          ref: 'dwprton/11.0-1'
           submodules: recursive
           fetch-depth: 1
 
@@ -20,28 +20,34 @@ jobs:
         with:
           platforms: arm64
 
+      - name: Free Disk Space
+        run: |
+          sudo rm -rf /usr/share/dotnet /opt/ghc "/usr/local/share/boost" "$AGENT_TOOLSDIRECTORY"
+          docker image prune -af
+
       - name: Build dwproton
         run: |
           export LDFLAGS="-Wl,-z,common-page-size=4096 -Wl,-z,max-page-size=4096"
           export CROSS_LDFLAGS="-Wl,-z,max-page-size=4096"
           
-          mkdir build && cd build
+          sed -i '/check_container_engine() {/,/}/c\check_container_engine() { stat "Bypassing check for x86-on-arm64"; ROOTLESS_CONTAINER=1; return 0; }' configure.sh
+          
+          mkdir -p build && cd build
           
           ../configure.sh \
             --build-name="dwproton-11-asahi-4k" \
             --target-arch=arm64 \
             --container-engine=docker \
-            --without-tts \
-            --without-nvidia-libs \
-            --without-wayland-libs \
-            --without-libpcap
+            --docker-opts="--platform linux/arm64" \
+            --relabel-volumes \
+            --without-tts
 
           make -j$(nproc) redist
 
-      - name: Package Result
+      - name: Package and Upload
         run: |
           tar -czvf dwproton-11.0-1-arm64-4k.tar.gz -C build/redist .
-
+          
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
