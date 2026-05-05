@@ -1,57 +1,81 @@
-name: Build dwproton 11.0-1 ARM64 (4K Paging) Source-Matched
+name: Snapshot Build
 
 on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build-arm64:
+    name: Build arm64
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout Source
-        uses: actions/checkout@v4
-        with:
-          ref: 'dwproton/11.0-1'
-          submodules: recursive
-          fetch-depth: 1
-
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
         with:
           platforms: arm64
 
-      - name: Free Disk Space
-        run: |
-          sudo rm -rf /usr/share/dotnet /opt/ghc "/usr/local/share/boost" "$AGENT_TOOLSDIRECTORY"
-          docker image prune -af
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-      - name: Build dwproton
+      - name: Restore cache
+        id: ccache-restore
+        uses: actions/cache/restore@v4
+        with:
+          path: ~/.ccache
+          key: ccache-proton-arm64-${{ github.run_id }}
+          restore-keys: |
+            ccache-proton-arm64-
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+          submodules: false
+
+      - name: Init submodules
         run: |
-          export LDFLAGS="-Wl,-z,common-page-size=4096 -Wl,-z,max-page-size=4096"
-          export CROSS_LDFLAGS="-Wl,-z,max-page-size=4096"
-    
-          sed -i '/check_container_engine() {/,/}/c\check_container_engine() { stat "Bypassing check for x86-on-arm64"; ROOTLESS_CONTAINER=1; return 0; }' configure.sh
-    
-          mkdir -p build && cd build
-    
+          git submodule update --init --filter=tree:0 --recursive
+          mkdir ./build
+
+      - name: Get version
+        id: vars
+        run: |
+          tag=$(grep -m1 'CURRENT_PREFIX_VERSION=' proton | cut -d'"' -f2)
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "sha_short=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Configure
+        working-directory: ./build
+        env:
+          RUSTFLAGS: -Copt-level=3 -Ctarget-cpu=generic
+          USE_LTO: 0
+        run: |
           ../configure.sh \
-            --build-name="dwproton-11-asahi-4k" \
+            --build-name=dwproton-${{ steps.vars.outputs.tag }}-${{ steps.vars.outputs.sha_short }}-arm64 \
             --target-arch=arm64 \
             --container-engine=docker \
-            --docker-opts="--platform linux/arm64" \
-            --relabel-volumes \
-            --without-tts
-    
-          make -j4 redist V=1 VERBOSE=1
-    
-          make clean-intermediate 2>/dev/null || true
+            --enable-ccache \
+            --without-tts \
+            --without-nvidia-libs
 
-      - name: Package and Upload
+      - name: Build
+        working-directory: ./build
         run: |
-          tar -czvf dwproton-11.0-1-arm64-4k.tar.gz -C build/redist .
-          
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
+          make -j$(nproc) redist
+
+      - name: Save cache
+        id: ccache-save
+        if: always()
+        uses: actions/cache/save@v4
         with:
-          name: dwproton-11.0-1-arm64-4k
-          path: dwproton-11.0-1-arm64-4k.tar.gz
+          path: ~/.ccache
+          key: ${{ steps.ccache-restore.outputs.cache-primary-key }}
+
+      - name: Upload snapshot artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: dwproton-${{ steps.vars.outputs.tag }}-${{ steps.vars.outputs.sha_short }}-arm64
+          path: |
+            ./build/dwproton-${{ steps.vars.outputs.tag }}-${{ steps.vars.outputs.sha_short }}-arm64.tar.xz
+            ./build/dwproton-${{ steps.vars.outputs.tag }}-${{ steps.vars.outputs.sha_short }}-arm64.sha512sum
+          retention-days: 14
