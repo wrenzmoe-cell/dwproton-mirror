@@ -1,0 +1,56 @@
+name: Build dwproton 11.0-1 for Asahi ARM64 (4K)
+
+on:
+  workflow_dispatch: # 手动触发构建
+
+jobs:
+  build:
+    # 使用 GitHub 原生 ARM64 运行器，无需 QEMU 模拟，编译速度最快
+    runs-on: ubuntu-24.04-arm64
+
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+        with:
+          ref: '11.0-1' # 指定 11.0-1 分支
+          submodules: recursive # 必须递归拉取所有子模块
+          fetch-depth: 1
+
+      - name: Setup Build Environment
+        run: |
+          # 准备构建目录，遵循 README 的推荐做法
+          mkdir build
+
+      - name: Build dwproton
+        run: |
+          # 注入 4K 分页支持参数：强制 ELF 段按 4096 字节对齐
+          # CUSTOM_LDFLAGS 确保参数能透传到内部交叉编译组件
+          export LDFLAGS="-Wl,-z,common-page-size=4096 -Wl,-z,max-page-size=4096"
+          export CROSS_LDFLAGS="-Wl,-z,max-page-size=4096"
+          
+          cd build
+          
+          # 执行配置脚本
+          # --target-arch=arm64: 明确目标架构
+          # --container-engine=docker: 使用 Docker 环境
+          ../configure.sh \
+            --build-name="dwproton-11-asahi-4k" \
+            --container-engine=docker \
+            --target-arch=arm64 \
+            --without-tts \
+            --enable-ccache
+
+          # 执行编译并生成 redist 目录[cite: 1]
+          # redist 包含可以直接解压到 Steam 目录的文件[cite: 1]
+          make -j$(nproc) redist
+
+      - name: Package Result
+        run: |
+          # 将编译生成的 redist 目录打包
+          tar -czvf dwproton-11.0-1-arm64-4k.tar.gz -C build/redist .
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dwproton-11.0-1-arm64-4k
+          path: dwproton-11.0-1-arm64-4k.tar.gz
