@@ -21,7 +21,7 @@ jobs:
             configure: >-
               --without-nvidia-libs
               --target-arch=arm64
-            runner: 'ubuntu-24.04'
+            runner: 'ubuntu-latest'
     uses: ./.github/workflows/_job_build.yml
     with:
       name: ${{ matrix.name }}
