@@ -63,5 +63,5 @@ jobs:
           - name: proton-${{ github.ref_name }}-arm64
     uses: ./.github/workflows/_job_upload.yml
     with:
-      version: ${{ github.ref_name }}[cite: 5]
-      name: ${{ matrix.name }}-redist # 必须带上 -redist 后缀以匹配 _job_build
+      version: ${{ github.ref_name }}
+      name: ${{ matrix.name }}-redist
