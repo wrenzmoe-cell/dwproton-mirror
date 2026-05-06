@@ -13,27 +13,17 @@ on:
 jobs:
   upload:
     name: Upload ${{ inputs.name }}
-    strategy:
-      matrix:
-        include:
-          - file: ${{ inputs.name }}.tar.xz
-          - file: ${{ inputs.name }}.sha512sum
-    runs-on: ubuntu-slim
+    runs-on: ubuntu-latest
     steps:
-
-      - name: Download ${{ matrix.file }} artifact
+      - name: Download Build Artifact
         uses: actions/download-artifact@v4
         with:
-          name: ${{ matrix.file }}
+          name: ${{ inputs.name }} 
+          path: ./upload_dir
 
-      - name: Upload ${{ matrix.file }} to release
+      - name: Upload to Release
         shell: bash
-        run: >-
-          gh
-          --repo "${{ github.server_url }}/${{ github.repository }}"
-          release upload
-          ${{ inputs.version }}
-          ${{ matrix.file }}
-          --clobber
+        run: |
+          gh release upload ${{ inputs.version }} ./upload_dir/* --clobber
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
