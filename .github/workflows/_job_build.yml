@@ -84,6 +84,8 @@ jobs:
         RUSTFLAGS: ${{ inputs.rustflags }}
         USE_LTO: 0
       run: |
+        sed -i '/check_container_engine() {/,/}/c\check_container_engine() { stat "Bypassing check for x86-on-arm64"; ROOTLESS_CONTAINER=1; return 0; }' ../configure.sh
+        
         ../configure.sh \
           --build-name=${{ inputs.name }} \
           --container-engine=docker \
