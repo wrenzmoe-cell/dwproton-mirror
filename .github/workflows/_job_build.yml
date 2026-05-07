@@ -103,6 +103,8 @@ jobs:
         USE_LTO: 0
         GIT_CONFIG_GLOBAL: ~/.gitconfig
       run: |
+        sudo chown -R $(whoami) /home/runner/work/dwproton-mirror/dwproton-mirror
+        git config --global safe.directory '*'
         sed -i '/check_container_engine() {/,/}/c\check_container_engine() { echo "Bypassing container check"; ROOTLESS_CONTAINER=1; return 0; }' configure.sh
         
         mkdir -p build
