@@ -71,6 +71,10 @@ jobs:
         submodules: recursive
         fetch-depth: 1
 
+    - name: Configure Git Safe Directories
+      run: |
+        git config --global --add safe.directory '*'      
+
     - name: Prepare host
       run: sudo apt update && sudo apt-get install -y ccache fontforge-nox
 
@@ -117,11 +121,7 @@ jobs:
         key: ccache-proton-${{ steps.ccache-id.outputs.checksum }}-${{ github.run_id }}
         restore-keys: |
           ccache-proton-${{ steps.ccache-id.outputs.checksum }}
-          
-    - name: Configure Git Safe Directories
-      run: |
-        git config --global --add safe.directory '*'          
-    
+              
     - name: Make ${{ inputs.name }}
       working-directory: ./build
       run: |
