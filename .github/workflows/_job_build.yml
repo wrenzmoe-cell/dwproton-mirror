@@ -73,7 +73,16 @@ jobs:
 
     - name: Configure Git Safe Directories
       run: |
-        git config --global --add safe.directory '*'      
+        git config --global --add safe.directory '*'
+        git config --global --add safe.directory /home/runner/work/dwproton-mirror/dwproton-mirror
+        git config --global --add safe.directory /home/runner/work/dwproton-mirror/dwproton-mirror/dxvk
+        git config --global --add safe.directory /home/runner/work/dwproton-mirror/dwproton-mirror/dxvk-sarek
+        git config --global --add safe.directory /home/runner/work/dwproton-mirror/dwproton-mirror/d7vk
+        git config --global --add safe.directory /home/runner/work/dwproton-mirror/dwproton-mirror/vkd3d-proton
+        git config --global --add safe.directory /home/runner/work/dwproton-mirror/dwproton-mirror/vkd3d-bratan
+        git config --global --add safe.directory /home/runner/work/dwproton-mirror/dwproton-mirror/FEX
+        git config --global --add safe.directory /home/runner/work/dwproton-mirror/dwproton-mirror/build/*
+        git config --global --add safe.directory /home/runner/work/dwproton-mirror/dwproton-mirror/build/.fex-post-source
 
     - name: Prepare host
       run: sudo apt update && sudo apt-get install -y ccache fontforge-nox
@@ -92,6 +101,7 @@ jobs:
         CFLAGS: ${{ inputs.cflags }}
         RUSTFLAGS: ${{ inputs.rustflags }}
         USE_LTO: 0
+        GIT_CONFIG_GLOBAL: ~/.gitconfig
       run: |
         sed -i '/check_container_engine() {/,/}/c\check_container_engine() { echo "Bypassing container check"; ROOTLESS_CONTAINER=1; return 0; }' configure.sh
         
